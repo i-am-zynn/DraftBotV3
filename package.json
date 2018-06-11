@@ -1,0 +1,29 @@
+{
+  "name": "draftbot",
+  "version": "1.0.0",
+  "description": "DraftMan Bot",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "moment": "^2.22.2",
+    "node-fetch": "^2.1.2",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "twit": "^2.2.9",
+    "ytdl-core": "^0.20.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DraftProducts/DraftBotV3.git"
+  },
+  "author": "DraftMan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DraftProducts/DraftBotV3/issues"
+  },
+  "homepage": "https://github.com/DraftProducts/DraftBotV3#readme"
+}
