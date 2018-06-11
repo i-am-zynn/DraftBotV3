@@ -103,32 +103,31 @@ const search = (message, args) => {
         });
         
         message.client.on('messageReactionAdd', (messageReaction, user) => {
-      const member = messageReaction.message.guild.member(user);
-      const channel = messageReaction.message.channel;
-      if(messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')){
-        const id = messageReaction.message.embeds[0].title.substring(32,36);
-        console.log(id)
-        const emoji = messageReaction.emoji.name;
-        console.log(emoji)
-        if(musics.get(id).has(emoji)){
-        console.log("j'ai trouvé la musique")
-          if(member.voiceChannel){
-            console.log("tu es là ou il faut")
-            member.voiceChannel.join().then(connexion => {
-            console.log("connecté");
-              const info = musics.get(id).get(emoji).split("§");
-            console.log(info)
-              const musicPlayer = guilds[messageReaction.message.guild.id];
-              // title§url§author§image
-              musicPlayer.queueSong(new Song(info[0], info[1], 'youtube',  info[2], info[3]));
-              message.channel.send(":musical_note: | La piste `"+info[0]+"` viens d'être ajouté par `"+info[2]+"`");
-
-              if (musicPlayer.status != 'playing') musicPlayer.playSong(msg, guild);
-            });
-          };
-        }
-      }
-    });
+            const member = messageReaction.message.guild.member(user);
+            const channel = messageReaction.message.channel;
+            if(messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')){
+                const id = messageReaction.message.embeds[0].title.substring(32,36);
+                console.log(id)
+                const emoji = messageReaction.emoji.name;
+                console.log(emoji)
+                if(musics.get(id).has(emoji)){
+                    console.log("j'ai trouvé la musique")
+                    if(member.voiceChannel){
+                        console.log("tu es là ou il faut")
+                        member.voiceChannel.join().then(connexion => {
+                            console.log("connecté");
+                            const info = musics.get(id).get(emoji).split("§");
+                            console.log(info)
+                            const musicPlayer = guilds[messageReaction.message.guild.id];
+                            // title§url§author§image
+                            musicPlayer.queueSong(new Song(info[0], info[1], 'youtube',  info[2], info[3]));
+                            message.channel.send(":musical_note: | La piste `"+info[0]+"` viens d'être ajouté par `"+info[2]+"`");
+                            if (musicPlayer.status != 'playing') musicPlayer.playSong(msg, guild);
+                        });
+                    };
+                }
+            }
+        });
     }).catch((error) => {
         console.log(error.message);
     });
