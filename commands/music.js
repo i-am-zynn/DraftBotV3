@@ -17,6 +17,7 @@ const execute = (fullArgs,message) => {
     if (!guilds[message.guild.id]) {
         guilds[message.guild.id] = new MusicPlayer();
     }
+    const client = message.client;
     let musicPlayer = guilds[message.guild.id];
     
     let musicCmd = fullArgs.split(' ').filter((val) => val !== '')[0];
@@ -49,6 +50,29 @@ const execute = (fullArgs,message) => {
             message.channel.send(`send help music embed`);
     }
 }
+
+client.on('messageReactionAdd', (messageReaction, user) => {
+  const member = messageReaction.message.guild.member(user);
+  const channel = messageReaction.message.channel;
+  if(messageReaction.message.embeds[0].description.startWith('Ajoutez une réaction à la musique de votre choix')){
+    const id = messageReaction.message.embeds[0].title.substring(32,1);
+    const emoji = messageReaction.emoji.name;
+    console.log(emoji);
+    if(playCmd.musics.get(id).has(emoji)){
+      if(member.voiceChannel){
+        member.voiceChannel.join().then(connexion => {
+          const info = playCmd.musics.get(id).get(emoji).split("§");
+          const musicPlayer = guilds[messageReaction.message.guild.id];
+          // title§url§author§image
+          musicPlayer.queueSong(new Song(info[0], info[1], 'youtube',  info[2], info[3]));
+          msg.channel.send(":musical_note: | La piste `"+info[0]+"` viens d'être ajouté par `"+info[2]+"`");
+
+          if (musicPlayer.status != 'playing') musicPlayer.playSong(msg, guild);
+        });
+      };
+    }
+  }
+});
 
 const playMusic = (message, musicPlayer, args) => {
     if (!args[0]) return;
