@@ -24,25 +24,28 @@ class MusicPlayer {
             this.musicChannel.send(`:musical_note: | Musiques en attente terminés.`);
             this.changeStatus('stopped');
         } else {
+            let song = this.queue[0];
+            let stream = song.getStream();
             if (this.voiceConnection) {
                 this.musicChannel.send(embeds.songEmbed(song));
                 this.changeStatus('playing');
+                this.dispatch = this.voiceConnection.playStream(stream, {
+                    passes: 2,
+                    volume: this.volume
+                });
             } else {
                 this.musicChannel = msg.channel;
                 msg.member.voiceChannel.join().then(connection => {
                     this.voiceConnection = connection;
                     this.changeStatus('stopped');
                     if (this.queue.length > 0) this.playSong(msg);
+                    this.dispatch = connection.playStream(stream, {
+                        passes: 2,
+                        volume: this.volume
+                    });
                 })
             }
 
-            let song = this.queue[0];
-            let stream = song.getStream();
-
-            this.dispatch = this.voiceConnection.playStream(stream, {
-                passes: 2,
-                volume: this.volume
-            });
             this.dispatch.on('error', error => {
                 this.dispatch = null;
                 this.queue.shift();
