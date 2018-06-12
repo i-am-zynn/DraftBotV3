@@ -13,18 +13,18 @@ const emojiTxt = [':one:', ':two:', ':three:', ':four:', ':five:'];
 let guilds = {};
 const musics = new Map();
 
-const execute = (fullArgs,message) => {
+const execute = (fullArgs, message) => {
     if (!message.guild.available) return;
     if (!guilds[message.guild.id]) {
         guilds[message.guild.id] = new MusicPlayer();
     }
-    
+
     let musicPlayer = guilds[message.guild.id];
-    
+
     let musicCmd = fullArgs.split(' ').filter((val) => val !== '')[0];
-    
+
     const args = fullArgs.split(' ').filter((val) => val !== '').slice(1);
-    
+
     if (musicCmd) musicCmd.toLowerCase();
     switch (musicCmd) {
         case 'play':
@@ -56,13 +56,13 @@ const playMusic = (message, musicPlayer, args) => {
     if (!args[0]) return;
     if (!args[0].startsWith('http')) {
         search(message, args);
-        
+
     } else if (args.search('youtube.com')) {
         let playlist = args.match(/list=(\S+?)(&|\s|$|#)/);
         if (playlist) {
             youtube.playlist(message, musicPlayer, playlist[1]);
         } else if (url.search(/v=(\S+?)(&|\s|$|#)/)) {
-            youtube.song(message,musicPlayer,args[1])
+            youtube.song(message, musicPlayer, args[1])
         } else {
             message.channel.send(`:no_entry_sign: | Lien youtube invalide !`);
         }
@@ -77,66 +77,58 @@ const playMusic = (message, musicPlayer, args) => {
 const search = (message, args) => {
     const keywords = encodeURIComponent(args.join(' ')).replace(/%20/g, '+');
     fetch(`https://www.googleapis.com/youtube/v3/search?order=viewCount&type=video&part=snippet&maxResults=5&key=${config.youtube_api}&q=${keywords}`)
-    .then((res) => res.json())
-    .then((data) => {
-        const {items: videos} = data;
+        .then((res) => res.json())
+        .then((data) => {
+            const {
+                items: videos
+            } = data;
 
-        const author = `${message.author.username}#${message.author.discriminator}`;
-        const temp = new Map();
+            const author = `${message.author.username}#${message.author.discriminator}`;
+            const temp = new Map();
 
-        const description = videos.reduce((prev, curr, i) => {
-            temp.set(emoji[i],`${emojiTxt[i]}§${videos[i].snippet.title}§https://www.youtube.com/watch?v=${videos[i].id.videoId}§${author}§${videos[i].snippet.thumbnails.default.url}`);
-            return `${prev}\n${emoji[i]} | [${videos[i].snippet.title}](https://www.youtube.com/watch?v=${videos[i].id.videoId})`;
-        }, `Ajoutez une réaction à la musique de votre choix pour la lancer !\n`);
-        // title§url§author§image
+            const description = videos.reduce((prev, curr, i) => {
+                temp.set(emoji[i], `${emojiTxt[i]}§${videos[i].snippet.title}§https://www.youtube.com/watch?v=${videos[i].id.videoId}§${author}§${videos[i].snippet.thumbnails.default.url}`);
+                return `${prev}\n${emoji[i]} | [${videos[i].snippet.title}](https://www.youtube.com/watch?v=${videos[i].id.videoId})`;
+            }, `Ajoutez une réaction à la musique de votre choix pour la lancer !\n`);
+            // title§url§author§image
 
-        const id = Math.floor(Math.random() * 3000 + 999);
+            const id = Math.floor(Math.random() * 3000 + 999);
 
-        const embed = new Discord.RichEmbed()
-            .setTitle(`Liste des musiques disponibles (${id})`)
-            .setDescription(description)
-            .setColor(0xcd6e57);
+            const embed = new Discord.RichEmbed()
+                .setTitle(`Liste des musiques disponibles (${id})`)
+                .setDescription(description)
+                .setColor(0xcd6e57);
 
-        musics.set(id.toString(), temp);
+            musics.set(id.toString(), temp);
 
-        message.reply({embed}).then(async (msg) => {
-            for (let j = 0; j < videos.length; j++) await msg.react(emoji[j]);
-        });
-        
-        message.client.on('messageReactionAdd', (messageReaction, user) => {
-            const member = messageReaction.message.guild.member(user);
-            const channel = messageReaction.message.channel;
-            if(user.bot) return;
-            if(messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')){
-                const id = messageReaction.message.embeds[0].title.substring(32,36);
-                console.log(id)
-                const emoji = messageReaction.emoji.name;
-                console.log(emoji)
-                if(musics.get(id)){
-                    console.log("j'ai trouvé la musique")
-                    if(member.voiceChannel){
-                        console.log("tu es là ou il faut")
-                        member.voiceChannel.join().then(connexion => {
-                            console.log("connecté");
+            message.reply({embed}).then(async (msg) => {
+                for (let j = 0; j < videos.length; j++) await msg.react(emoji[j]);
+            });
+
+            message.client.on('messageReactionAdd', (messageReaction, user) => {
+                const member = messageReaction.message.guild.member(user);
+                const channel = messageReaction.message.channel;
+                if (user.bot) return;
+                if (messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')) {
+                    const id = messageReaction.message.embeds[0].title.substring(32, 36);
+                    const emoji = messageReaction.emoji.name;
+                    if (musics.get(id)) {
+                        if (member.voiceChannel) {
                             const info = musics.get(id).get(emoji).split("§");
-                            console.log(info)
                             const musicPlayer = guilds[messageReaction.message.guild.id];
-                            // title§url§author§image
-                            musicPlayer.queueSong(new Song(info[0], info[1], 'youtube',  info[2], info[3]));
-                            message.channel.send(":musical_note: | La piste `"+info[0]+"` viens d'être ajouté par `"+info[2]+"`");
-                            if (musicPlayer.status != 'playing') musicPlayer.playSong(msg, guild);
-                        });
-                    }else{
-                        console.log("j'ai pas trouvé le salon")
+                            console.log(info[1]);
+                            musicPlayer.queueSong(new Song(info[0], info[1], 'youtube', info[2], info[3]));
+                            if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
+                            message.channel.send(`:musical_note: | La piste ${info[0]} viens d'être ajouté par ${info[3]}`);
+                        } else {
+                            console.log("j'ai pas trouvé le salon")
+                        }
                     }
-                }else{
-                    console.log("j'ai pas trouvé la musique")
                 }
-            }
+            });
+        }).catch((error) => {
+            console.log(error.message);
         });
-    }).catch((error) => {
-        console.log(error.message);
-    });
 }
 
 const youtube = {
@@ -148,8 +140,7 @@ const youtube = {
                 const videos = data.items;
                 const author = `${message.author.username}#${message.author.discriminator}`;
                 musicPlayer.queueSong(
-                    new Song(videos[i].snippet.title,`https://www.youtube.com/watch?v=${args}`,'youtube',author,videos[i].snippet.thumbnails.default.url
-                    )
+                    new Song(videos[i].snippet.title, `https://www.youtube.com/watch?v=${args}`, 'youtube', author, videos[i].snippet.thumbnails.default.url)
                 );
                 message.channel.send(
                     `:musical_note: | La piste \`${videos[i].snippet.title}\` viens d'être ajouté par \`${author}\``);
