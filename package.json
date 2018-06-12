@@ -5,8 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "discord.js": "^11.3.2",
+    "ffmpeg": "0.0.4",
     "moment": "^2.22.2",
     "node-fetch": "^2.1.2",
+    "npm": "^6.1.0",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "twit": "^2.2.9",

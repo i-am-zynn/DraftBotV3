@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const rp = require('request-promise');
 const fetch = require('node-fetch');
+const ffmpeg = require('ffmpeg');
 const config = require('../config.json');
 
 const Song = require('./Song');
@@ -84,7 +85,7 @@ const search = (message, args) => {
         const temp = new Map();
 
         const description = videos.reduce((prev, curr, i) => {
-            temp.set(`${emojiTxt[i]}§${videos[i].snippet.title}§https://www.youtube.com/watch?v=${videos[i].id.videoId}§${author}§${videos[i].snippet.thumbnails.default.url}`);
+            temp.set(emoji[i],`${emojiTxt[i]}§${videos[i].snippet.title}§https://www.youtube.com/watch?v=${videos[i].id.videoId}§${author}§${videos[i].snippet.thumbnails.default.url}`);
             return `${prev}\n${emoji[i]} | [${videos[i].snippet.title}](https://www.youtube.com/watch?v=${videos[i].id.videoId})`;
         }, `Ajoutez une réaction à la musique de votre choix pour la lancer !\n`);
         // title§url§author§image
@@ -105,12 +106,13 @@ const search = (message, args) => {
         message.client.on('messageReactionAdd', (messageReaction, user) => {
             const member = messageReaction.message.guild.member(user);
             const channel = messageReaction.message.channel;
+            if(user.bot) return;
             if(messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')){
                 const id = messageReaction.message.embeds[0].title.substring(32,36);
                 console.log(id)
                 const emoji = messageReaction.emoji.name;
                 console.log(emoji)
-                if(musics.get(id).has(emoji)){
+                if(musics.get(id)){
                     console.log("j'ai trouvé la musique")
                     if(member.voiceChannel){
                         console.log("tu es là ou il faut")
@@ -124,7 +126,11 @@ const search = (message, args) => {
                             message.channel.send(":musical_note: | La piste `"+info[0]+"` viens d'être ajouté par `"+info[2]+"`");
                             if (musicPlayer.status != 'playing') musicPlayer.playSong(msg, guild);
                         });
-                    };
+                    }else{
+                        console.log("j'ai pas trouvé le salon")
+                    }
+                }else{
+                    console.log("j'ai pas trouvé la musique")
                 }
             }
         });
