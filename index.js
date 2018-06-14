@@ -15,13 +15,13 @@ const musicCmd = require('./commands/music'),
       infosCmd = require('./commands/infos'),
       pingCmd = require('./commands/ping'),
       sayCmd = require('./commands/say'),
-      clearCmd = require('./commands/clear');
-
+      clearCmd = require('./commands/clear'),
+      embeds = require('./embeds');
 // ;
 
-
 DraftBot.on('ready', () => {
-  console.log("DraftBot connecté !")
+  console.log('DraftBot connecté !')
+  console.log(`Actif sur ${DraftBot.guilds.size} serveurs.`);
   DraftBot.user.setActivity('Lire ses lignes', { type: 'PLAYING' })
 });
 
@@ -64,7 +64,7 @@ const executeCommand = (cmd,message,fullArgs) => {
         clear: () => clearCmd.execute(fullArgs,message)
     }
     if(!commands[cmd]){
-        message.channel.send('help')
+        message.channel.send(embeds.help())
         return;
     }
     return commands[cmd]();

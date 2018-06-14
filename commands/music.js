@@ -3,6 +3,7 @@ const rp = require('request-promise');
 const fetch = require('node-fetch');
 const ffmpeg = require('ffmpeg');
 const config = require('../config.json');
+const embeds = require('../embeds');
 
 const Song = require('./Song');
 const MusicPlayer = require('./MusicPlayer');
@@ -32,23 +33,29 @@ const execute = (fullArgs, message) => {
         case 'p':
             return playMusic(message, musicPlayer, args);
         case 'skip':
-            return guild.skipSong(message);
+            return musicPlayer.skipSong(message);
         case 'next':
-            return guild.skipSong(message);
+            return musicPlayer.skipSong(message);
         case 'pause':
-            return guild.pauseSong();
+            return musicPlayer.pauseSong();
         case 'resume':
-            return guild.resumeSong();
+            return musicPlayer.resumeSong();
         case 'queue':
-            return guild.printQueue(message);
+            return musicPlayer.printQueue(message);
         case 'np':
-            return guild.nowPlaying(message);
+            return musicPlayer.nowPlaying(message);
         case 'volume':
-            return guild.setVolume(message);
+            return musicPlayer.setVolume(message);
         case 'clear':
-            return guild.purgeQueue(message);
+            return musicPlayer.purgeQueue(message);
+        case 'music':
+            return musicPlayer.nowPlaying(message);
+        case 'musique':
+            return musicPlayer.nowPlaying(message);
+        case 'leave':
+            return musicPlayer.leaveVc(message);
         default:
-            message.channel.send(`send help music embed`);
+            message.channel.send(embeds.helpm());
     }
 }
 
@@ -117,11 +124,12 @@ const search = (message, args) => {
                             const info = musics.get(id).get(emoji).split("§");
                             const musicPlayer = guilds[messageReaction.message.guild.id];
                             console.log(info[1]);
-                            musicPlayer.queueSong(new Song(info[0], info[1], 'youtube', info[2], info[3]));
+                            musicPlayer.queueSong(new Song(info[1], info[2], 'youtube', info[3], info[4]));
                             if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
-                            message.channel.send(`:musical_note: | La piste ${info[0]} viens d'être ajouté par ${info[3]}`);
+                            messageReaction.message.clearReactions();
                         } else {
-                            console.log("j'ai pas trouvé le salon")
+                            message.channel.send(`:no_entry_sign: | Vous devez être dans un salon vocal pour lancer une musique !`)
+                            messageReaction.remove(user)
                         }
                     }
                 }

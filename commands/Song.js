@@ -1,8 +1,7 @@
 const ytdl = require('ytdl-core');
 
 class Song {
-	constructor(emoji,title, url, type, authorname, thumbnail) {
-        this.emoji = emoji;
+	constructor(title, url, type, authorname, thumbnail) {
 		this.title = title;
 		this.url = url;
 		this.type = type; //youtube, soundcloud, search

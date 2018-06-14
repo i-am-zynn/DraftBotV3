@@ -29,9 +29,28 @@ class MusicPlayer {
             if (this.voiceConnection) {
                 this.musicChannel.send(embeds.songEmbed(song));
                 this.changeStatus('playing');
+                if (this.queue.length === 0) this.playSong(msg);
                 this.dispatch = this.voiceConnection.playStream(stream, {
                     passes: 2,
                     volume: this.volume
+                });
+
+                this.dispatch.on('error', error => {
+                    this.dispatch = null;
+                    this.queue.shift();
+                    this.playSong(msg);
+                });
+
+                this.dispatch.on('end', reason => {
+                    this.dispatch = null;
+                    this.queue.shift();
+                    if (reason != 'leave') {
+                        this.playSong(msg);
+                    }
+                });
+
+                this.dispatch.on('debug', info => {
+                    console.log(info);
                 });
             } else {
                 this.musicChannel = msg.channel;
@@ -43,26 +62,26 @@ class MusicPlayer {
                         passes: 2,
                         volume: this.volume
                     });
+
+                    this.dispatch.on('error', error => {
+                        this.dispatch = null;
+                        this.queue.shift();
+                        this.playSong(msg);
+                    });
+
+                    this.dispatch.on('end', reason => {
+                        this.dispatch = null;
+                        this.queue.shift();
+                        if (reason != 'leave') {
+                            this.playSong(msg);
+                        }
+                    });
+
+                    this.dispatch.on('debug', info => {
+                        console.log(info);
+                    });
                 })
             }
-
-            this.dispatch.on('error', error => {
-                this.dispatch = null;
-                this.queue.shift();
-                this.playSong(msg);
-            });
-
-            this.dispatch.on('end', reason => {
-                this.dispatch = null;
-                this.queue.shift();
-                if (reason != 'leave') {
-                    this.playSong(msg);
-                }
-            });
-
-            this.dispatch.on('debug', info => {
-                console.log(info);
-            });
         }
     }
     skipSong() {
@@ -78,6 +97,7 @@ class MusicPlayer {
     pauseSong() {
         if (this.dispatch) {
             this.dispatch.pause();
+            this.musicChannel.send(":musical_note: | La musique viens d'être mis en pause.");
         } else {
             this.musicChannel.send(
                 `:no_entry_sign: | Il n'y a pas de musique en cours !`
@@ -87,6 +107,7 @@ class MusicPlayer {
     resumeSong() {
         if (this.dispatch) {
             this.dispatch.resume();
+            this.musicChannel.send(":musical_note: | La musique viens d'être remise.");
         } else {
             this.musicChannel.send(
                 `:no_entry_sign: | Il n'y a pas de musique en pause !`
