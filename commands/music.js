@@ -123,7 +123,7 @@ const search = (message, args) => {
                         if (member.voiceChannel) {
                             const info = musics.get(id).get(emoji).split("§");
                             const musicPlayer = guilds[messageReaction.message.guild.id];
-                            console.log(info[1]);
+                            console.log(`${info[1]}`);
                             musicPlayer.queueSong(new Song(info[1], info[2], 'youtube', info[3], info[4]));
                             if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
                             messageReaction.message.clearReactions();

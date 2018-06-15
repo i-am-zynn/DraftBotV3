@@ -1,7 +1,7 @@
 const embeds = require('../embeds');
 
 class MusicPlayer {
-    constructor(guild) {
+    constructor() {
         this.queue = [];
         this.musicChannel = null;
         this.voiceConnection = null;
