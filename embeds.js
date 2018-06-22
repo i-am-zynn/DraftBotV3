@@ -2,19 +2,26 @@ const Discord = require('discord.js');
 
 module.exports = {
   join: (user) => new Discord.RichEmbed()
-    .setTitle(':cucumber: Nouveau membre')
+    .setTitle(':banana: Nouveau membre')
     .setColor(0x39d600)
     .setDescription(user.tag + " (" + user.id + ") est arrivé !"),
   left: (user) => new Discord.RichEmbed()
-    .setTitle('Membre parti')
+    .setTitle(':wastebasket: Membre parti')
     .setDescription(user.tag + " (" + user.id + ") est parti !"),
-  welcome: (user) => new Discord.RichEmbed()
+  welcome: (member) => new Discord.RichEmbed()
     .setTitle("DraftMan.fr - WebDesigner", "https://www.draftman.fr")
-    .setDescription("Bienvenue à toi " + user.username + " sur le serveur Discord de DraftMan\nC'est un discord qui vise à rassembler ses connaissances et les personnes qui lui sont cher !\nSi tu es là c'est soit qu'il t'as invité par ce qu'il te considère comme une personne qu'il aprécie soit tu es un client ou une personne interessé par ce qu'il fait !\nSi tu es un client je t'encourage à faire la commande `!commande` pour qu'il puisse prendre contact avec toi plus facilement !")
+    .setDescription("Bienvenue à toi " + member.user.username + " sur le serveur Discord de DraftMan\nC'est un discord qui vise à rassembler ses connaissances et les personnes qui lui sont cher !\nSi tu es là c'est soit qu'il t'as invité par ce qu'il te considère comme une personne qu'il aprécie soit tu es un client ou une personne interessé par ce qu'il fait !\nSi tu es un client je t'encourage à faire la commande `!commande` pour qu'il puisse prendre contact avec toi plus facilement !")
     .setColor(0xcd6e57)
     .setURL("https://www.draftman.fr")
     .setFooter("DraftMan | Développeur FrontEnd & Graphiste", "https://www.draftman.fr/images/avatar.jpg")
     .setThumbnail("https://www.draftman.fr/images/avatar.jpg"),
+  welcomeOtherGuild: (member) => new Discord.RichEmbed()
+			.setTitle(member.guild.name, "https://www.draftman.fr")
+			.setDescription("Bienvenue à toi " + member.user.username + " sur le serveur "+member.guild.name)
+			.setColor(0x2014ff)
+      .setFooter(`${member.guild.memberCount} membres`, member.guild.iconURL)
+      .setTimestamp(new Date())
+			.setThumbnail(member.guild.iconURL),
   infos: (message) => new Discord.RichEmbed()
     .setTitle("Informations")
     .setDescription("Voici quelques informations")
@@ -90,6 +97,5 @@ module.exports = {
     .setThumbnail(image)
     .setColor(0xcd6e57)
     .setTimestamp(new Date())
-    .setFooter("DraftMan | Développeur FrontEnd & Graphiste", "https://www.draftman.fr/images/avatar.jpg")
-    .setAuthor(author.username, author.displayAvatarURL)
+    .setFooter(author.username, "author.displayAvatarURL")
 }
