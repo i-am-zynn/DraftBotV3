@@ -62,8 +62,13 @@ const execute = (fullArgs, message) => {
 const playMusic = (message, musicPlayer, args) => {
     if (!args[0]) return;
     if (!args[0].startsWith('http')) {
-        search(message, args);
-
+        search(message, args).then(([[,name,url,author,image],user]) => {
+            const musicPlayer = guilds[message.guild.id];
+            console.log(`${name}`);
+            musicPlayer.queueSong(new Song(name, url, 'youtube', author, image));
+            message.channel.send(embeds.songNew(user,name, url,image,message))
+            if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
+        })
     } else if (args.search('youtube.com')) {
         let playlist = args.match(/list=(\S+?)(&|\s|$|#)/);
         if (playlist) {
@@ -83,13 +88,12 @@ const playMusic = (message, musicPlayer, args) => {
 
 const search = (message, args) => {
     const keywords = encodeURIComponent(args.join(' ')).replace(/%20/g, '+');
-    fetch(`https://www.googleapis.com/youtube/v3/search?order=viewCount&type=video&part=snippet&maxResults=5&key=${config.youtube_api}&q=${keywords}`)
+    return fetch(`https://www.googleapis.com/youtube/v3/search?order=relevance&type=video&part=snippet&maxResults=5&key=${config.youtube_api}&q=${keywords}`)
         .then((res) => res.json())
         .then((data) => {
             const {
                 items: videos
             } = data;
-
             const author = `${message.author.username}#${message.author.discriminator}`;
             const temp = new Map();
 
@@ -108,36 +112,32 @@ const search = (message, args) => {
 
             musics.set(id.toString(), temp);
 
-            message.reply({embed}).then(async (msg) => {
-                for (let j = 0; j < videos.length; j++) await msg.react(emoji[j]);
-            });
+            return message.reply({ embed })
+                .then(message => [message, videos.map((_, index) => emoji[index])])
+                .then(([message, emojis]) => emojis.reduce((acc, emoji) => acc.then(() => message.react(emoji)), Promise.resolve()))
+                .then(({message}) => new Promise((resolve, reject) => {
+                    message.client.on('messageReactionAdd', (messageReaction, user) => {
+                        const member = messageReaction.message.guild.member(user);
+                        const channel = messageReaction.message.channel;
+                        if (user.bot) return;
+                        if (messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')) {
+                            const id = messageReaction.message.embeds[0].title.substring(32, 36);
+                            const emoji = messageReaction.emoji.name;
+                            if (musics.get(id)) {
+                                if (member.voiceChannel) {
+                                    const info = musics.get(id).get(emoji).split("§");
 
-            message.client.on('messageReactionAdd', (messageReaction, user) => {
-                const member = messageReaction.message.guild.member(user);
-                const channel = messageReaction.message.channel;
-                if (user.bot) return;
-                if (messageReaction.message.embeds[0].description.startsWith('Ajoutez une réaction à la musique de votre choix')) {
-                    const id = messageReaction.message.embeds[0].title.substring(32, 36);
-                    const emoji = messageReaction.emoji.name;
-                    if (musics.get(id)) {
-                        if (member.voiceChannel) {
-                            const info = musics.get(id).get(emoji).split("§");
-                            const musicPlayer = guilds[messageReaction.message.guild.id];
-                            console.log(`${info[1]}`);
-                            musicPlayer.queueSong(new Song(info[1], info[2], 'youtube', info[3], info[4]));
-                            channel.send(embeds.songNew(user,info[1], info[2],info[4],message))
-                            if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
-                            messageReaction.message.clearReactions();
-                        } else {
-                            message.channel.send(`:no_entry_sign: | Vous devez être dans un salon vocal pour lancer une musique !`)
-                            messageReaction.remove(user)
+                                    resolve([info,user])
+                                    messageReaction.message.clearReactions();
+                                } else {
+                                    message.channel.send(`:no_entry_sign: | Vous devez être dans un salon vocal pour lancer une musique !`)
+                                    messageReaction.remove(user)
+                                }
+                            }
                         }
-                    }
-                }
-            });
-        }).catch((error) => {
-            console.log(error.message);
-        });
+                    });
+                }));
+        })
 }
 
 const youtube = {
