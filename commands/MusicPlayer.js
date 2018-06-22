@@ -1,7 +1,7 @@
 const embeds = require('../embeds');
 
 class MusicPlayer {
-    constructor() {
+    constructor(guild) {
         this.queue = [];
         this.musicChannel = null;
         this.voiceConnection = null;
@@ -19,7 +19,7 @@ class MusicPlayer {
             this.queue.push(song);
         }
     }
-    playSong(msg) {
+    playSong(message) {
         if (this.queue.length === 0) {
             this.musicChannel.send(`:musical_note: | Musiques en attente terminés.`);
             this.changeStatus('stopped');
@@ -27,9 +27,8 @@ class MusicPlayer {
             let song = this.queue[0];
             let stream = song.getStream();
             if (this.voiceConnection) {
-                this.musicChannel.send(embeds.songEmbed(song));
+                this.musicChannel.send(embeds.songEmbed(song))
                 this.changeStatus('playing');
-                if (this.queue.length === 0) this.playSong(msg);
                 this.dispatch = this.voiceConnection.playStream(stream, {
                     passes: 2,
                     volume: this.volume
@@ -38,14 +37,14 @@ class MusicPlayer {
                 this.dispatch.on('error', error => {
                     this.dispatch = null;
                     this.queue.shift();
-                    this.playSong(msg);
+                    this.playSong(message);
                 });
 
                 this.dispatch.on('end', reason => {
                     this.dispatch = null;
                     this.queue.shift();
                     if (reason != 'leave') {
-                        this.playSong(msg);
+                        this.playSong(message);
                     }
                 });
 
@@ -53,11 +52,11 @@ class MusicPlayer {
                     console.log(info);
                 });
             } else {
-                this.musicChannel = msg.channel;
-                msg.member.voiceChannel.join().then(connection => {
+                this.musicChannel = message.channel;
+                this.musicChannel.send(embeds.songEmbed(song));
+                message.member.voiceChannel.join().then(connection => {
                     this.voiceConnection = connection;
-                    this.changeStatus('stopped');
-                    if (this.queue.length > 0) this.playSong(msg);
+                    this.changeStatus('playing');
                     this.dispatch = connection.playStream(stream, {
                         passes: 2,
                         volume: this.volume
@@ -66,14 +65,14 @@ class MusicPlayer {
                     this.dispatch.on('error', error => {
                         this.dispatch = null;
                         this.queue.shift();
-                        this.playSong(msg);
+                        this.playSong(message);
                     });
 
                     this.dispatch.on('end', reason => {
                         this.dispatch = null;
                         this.queue.shift();
                         if (reason != 'leave') {
-                            this.playSong(msg);
+                            this.playSong(message);
                         }
                     });
 

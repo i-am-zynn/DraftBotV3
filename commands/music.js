@@ -17,7 +17,7 @@ const musics = new Map();
 const execute = (fullArgs, message) => {
     if (!message.guild.available) return;
     if (!guilds[message.guild.id]) {
-        guilds[message.guild.id] = new MusicPlayer();
+        guilds[message.guild.id] = new MusicPlayer(message.guild.id);
     }
 
     let musicPlayer = guilds[message.guild.id];
@@ -125,6 +125,7 @@ const search = (message, args) => {
                             const musicPlayer = guilds[messageReaction.message.guild.id];
                             console.log(`${info[1]}`);
                             musicPlayer.queueSong(new Song(info[1], info[2], 'youtube', info[3], info[4]));
+                            channel.send(embeds.songNew(user,info[1], info[2],info[4],message))
                             if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
                             messageReaction.message.clearReactions();
                         } else {
