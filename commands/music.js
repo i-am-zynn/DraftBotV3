@@ -66,7 +66,7 @@ const playMusic = (message, musicPlayer, args) => {
             const musicPlayer = guilds[message.guild.id];
             console.log(`${name}`);
             musicPlayer.queueSong(new Song(name, url, 'youtube', author, image));
-            message.channel.send(embeds.songNew(user,name, url,image,message))
+            message.channel.send(embeds.songNew(user,name, url,image,message));
             if (musicPlayer.status != 'playing') musicPlayer.playSong(message);
         })
     } else if (args.search('youtube.com')) {
