@@ -53,13 +53,13 @@ DraftBot.on('guildMemberAdd', member => {
 	}
 
 	if(member.guild.channels.find("name","logs")){
-		member.guild.channels.find("name","logs").send(embeds.join(user));
+		member.guild.channels.find("name","logs").send(embeds.join(member.user));
 	}
 });
 
 DraftBot.on('guildMemberRemove', member => {
 	if(member.guild.channels.find("name","logs")){
-		member.guild.channels.find("name","logs").send(embeds.left(user));
+		member.guild.channels.find("name","logs").send(embeds.left(member.user));
 	}
 });
 

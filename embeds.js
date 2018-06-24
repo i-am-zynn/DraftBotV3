@@ -7,7 +7,8 @@ module.exports = {
     .setDescription(user.tag + " (" + user.id + ") est arrivé !"),
   left: (user) => new Discord.RichEmbed()
     .setTitle(':wastebasket: Membre parti')
-    .setDescription(user.tag + " (" + user.id + ") est parti !"),
+    .setColor(0xce0000)
+    .setDescription(user.tag + " (" + user.id + ") viens de quitter le serveur !"),
   welcome: (member) => new Discord.RichEmbed()
     .setTitle("DraftMan.fr - WebDesigner", "https://www.draftman.fr")
     .setDescription("Bienvenue à toi " + member.user.username + " sur le serveur Discord de DraftMan\nC'est un discord qui vise à rassembler ses connaissances et les personnes qui lui sont cher !\nSi tu es là c'est soit qu'il t'as invité par ce qu'il te considère comme une personne qu'il aprécie soit tu es un client ou une personne interessé par ce qu'il fait !\nSi tu es un client je t'encourage à faire la commande `!commande` pour qu'il puisse prendre contact avec toi plus facilement !")
@@ -86,16 +87,16 @@ module.exports = {
     .addField("!music volume", "Ajuster le volume")
     .addField("!music stop", "Arrêter la musique et vider la liste d'attente")
     .addField("!music leave", "Faire se déconnecter le bot au salon vocal"),
-  songEmbed: (song) => new Discord.RichEmbed()
-    .addField(":notes: En cours",`[${song.title}](${song.url}) ajouté par **${song.author}**`)
+  songEmbed: (song,user) => new Discord.RichEmbed()
+    .addField(":notes: Musique en cours",`[${song.title}](${song.url}) ajouté par ${user}`)
     .setThumbnail(`${song.thumbnail}`)
     .setColor(0xcd6e57)
     .setTimestamp(new Date())
-    .setFooter("DraftMan | Développeur FrontEnd & Graphiste", "https://www.draftman.fr/images/avatar.jpg"),
+    .setFooter(user.username, user.displayAvatarURL),
   songNew: (author,name,url,image,message) => new Discord.RichEmbed()
-    .addField(":musical_score: Musique ajouté à la file d'attente",`Ajout de la piste [${name}](${url})`)
+    .addField(":notes: Musique ajouté à la file d'attente",`Ajout de la piste [${name}](${url})`)
     .setThumbnail(image)
     .setColor(0xcd6e57)
     .setTimestamp(new Date())
-    .setFooter(author.username, "author.displayAvatarURL")
+    .setFooter(author.username, author.displayAvatarURL)
 }
