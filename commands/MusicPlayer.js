@@ -27,7 +27,7 @@ class MusicPlayer {
             let song = this.queue[0];
             let stream = song.getStream();
             if (this.voiceConnection) {
-                this.musicChannel.send(embeds.songEmbed(song))
+                this.musicChannel.send(embeds.songEmbed(song,message.author))
                 this.changeStatus('playing');
                 this.dispatch = this.voiceConnection.playStream(stream, {
                     passes: 2,
@@ -53,7 +53,7 @@ class MusicPlayer {
                 });
             } else {
                 this.musicChannel = message.channel;
-                this.musicChannel.send(embeds.songEmbed(song));
+                this.musicChannel.send(embeds.songEmbed(song,message.author));
                 message.member.voiceChannel.join().then(connection => {
                     this.voiceConnection = connection;
                     this.changeStatus('playing');
@@ -146,7 +146,7 @@ class MusicPlayer {
     }
     nowPlaying(msg) {
         if (this.queue.length > 0) {
-            msg.channel.send(embeds.songEmbed(this.queue));
+            msg.channel.send(embeds.songEmbed(this.queue[0],msg.author));
         } else {
             msg.channel.send(
                 ":no_entry_sign: | Il n'y a pas de musique en cours !"
