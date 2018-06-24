@@ -11,7 +11,7 @@
     "npm": "^6.1.0",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
-    "twit": "^2.2.9",
+    "twit": "^2.2.10",
     "ytdl-core": "^0.20.4"
   },
   "devDependencies": {},
