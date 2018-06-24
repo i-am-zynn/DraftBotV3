@@ -25,16 +25,16 @@ const execute = (fullArgs,message) => {
 
             switch (type) {
                 case 'pc':
-                    return results(message, stats.br.stats.pc,stats);
+                    return results(stats.br.stats.pc,stats);
                 case 'xbox':
-                    return results(message, stats.br.stats.xbox,stats);
+                    return results(stats.br.stats.xbox,stats);
                 case 'ps4':
-                    return results(message, stats.br.stats.ps4,stats);
+                    return results(stats.br.stats.ps4,stats);
                 default:
                     message.channel.send(`:no_entry_sign: | Veuillez utiliser la commande comme ceci : \`/fortnite <pc|xbox|ps4> <Pseudo>\``);
             }
 
-            const results = (message,type,stats) => {
+            const results = (type,stats) => {
                 const embed = new Discord.RichEmbed()
                 .setAuthor(`Statistiques fortnite de ${stats.displayName}`, message.author.displayAvatarURL)
                 .setDescription(`Voici les statistiques du joueur ${stats.displayName} sur le jeu [fortnite](https://www.epicgames.com/fortnite/fr/home).`)
@@ -48,6 +48,9 @@ const execute = (fullArgs,message) => {
                 .addField("Morts Solo", type.solo.deaths, true)
                 .addField("Morts Duo", type.duo.deaths, true)
                 .addField("Morts Section", type.squad.deaths, true)
+                .addField("Temps de jeu Solo", Math.trunc(type.solo.minutesPlayed/60), true)
+                .addField("Temps de jeu Duo", Math.trunc(type.duo.minutesPlayed/60), true)
+                .addField("Temps de jeu Section", Math.trunc(type.squad.minutesPlayed/60), true)
                 .addField("Dernière partie Solo", moment(type.solo.lastMatch).fromNow(), true)
                 .addField("Dernière partie Duo", moment(type.duo.lastMatch).fromNow(), true)
                 .addField("Dernière partie Section", moment(type.squad.lastMatch).fromNow(), true)
@@ -56,7 +59,6 @@ const execute = (fullArgs,message) => {
 
                 message.reply({embed})
             }
-
         } else {
             message.channel.send(`:no_entry_sign: | Le pseudo ${user} n'existe pas !`)
         }
