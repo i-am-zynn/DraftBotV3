@@ -129,6 +129,7 @@ const search = (message, args) => {
 
                                     resolve([info,user])
                                     messageReaction.message.clearReactions();
+                                    messageReaction.message.delete(3000);
                                 } else {
                                     message.channel.send(`:no_entry_sign: | Vous devez être dans un salon vocal pour lancer une musique !`)
                                     messageReaction.remove(user)
