@@ -16,6 +16,7 @@ const musicCmd = require('./commands/music'),
     pingCmd = require('./commands/ping'),
     sayCmd = require('./commands/say'),
     clearCmd = require('./commands/clear'),
+    sondageCmd = require('./commands/sondage'),
     embeds = require('./embeds');
 // ;
 
@@ -93,7 +94,8 @@ const executeCommand = (cmd, message, fullArgs) => {
         info: () => infosCmd.execute(message),
         ping: () => pingCmd.execute(message),
         say: () => sayCmd.execute(fullArgs, message),
-        clear: () => clearCmd.execute(fullArgs, message)
+        clear: () => clearCmd.execute(fullArgs, message),
+        sondage: () => sondageCmd.execute(fullArgs, message)
     }
     if (!commands[cmd]) {
         message.channel.send(embeds.help())
