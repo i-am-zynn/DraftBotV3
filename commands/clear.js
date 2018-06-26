@@ -4,7 +4,7 @@ const execute = (fullArgs,message) => {
 
     const number = fullArgs.split(' ').filter((val) => val !== '')[0];
     
-	if (message.member.hasPermission("MANAGE_MESSAGES")) {
+	if (!message.member.hasPermission("MANAGE_MESSAGES")) {
 		return message.channel.send(":no_entry_sign: | Vous n'avez pas la permission de supprimer des messages")
 	}
 	if(isNaN(number)){
