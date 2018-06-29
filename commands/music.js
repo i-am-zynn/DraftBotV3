@@ -21,6 +21,7 @@ const execute = (fullArgs, message) => {
     }
 
     let musicPlayer = guilds[message.guild.id];
+    console.log(musicPlayer);
 
     let musicCmd = fullArgs.split(' ').filter((val) => val !== '')[0];
 

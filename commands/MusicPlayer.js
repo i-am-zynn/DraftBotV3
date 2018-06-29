@@ -2,6 +2,7 @@ const embeds = require('../embeds');
 
 class MusicPlayer {
     constructor(guild) {
+        this.guildID = guild;
         this.queue = [];
         this.musicChannel = null;
         this.voiceConnection = null;
