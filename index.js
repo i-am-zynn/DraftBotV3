@@ -112,7 +112,7 @@ process.on('SIGINT', () => {
 
 
 const pinCreation = message => {
-    if (message.channel === DraftBot.channels.find('name','creations')) {
+    if (message.channel === DraftBot.channels.find('name','créations')) {
 		if(message.attachments.filename !== undefined || message.content.includes('http')){
 			message.react("❤");
 			message.pin();
