@@ -21,7 +21,7 @@ const musicCmd = require('./commands/music'),
 // ;
 
 DraftBot.on('ready', () => {
-    console.log('DraftBot connecté !')
+    console.log(`${this.client.user.username} connecté !`)
     console.log(`Actif sur ${DraftBot.guilds.size} serveurs.`);
     DraftBot.user.setActivity('Lire ses lignes', {
         type: 'PLAYING'
